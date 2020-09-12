@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const middlewares = require("./utils/middlewares");
 const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
 
 try {
   mongoose.connect("mongodb://localhost:27017/cake-walk-db", {
@@ -14,6 +15,9 @@ try {
 } catch (error) {
   console.log("Error in connection to mongodb : ", error.message);
 }
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 app.use(middlewares.requestLogger);
 
