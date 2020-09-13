@@ -23,6 +23,15 @@ const UserSchema = new Schema(
       required: true,
       select: false,
     },
+    role: {
+      //0 - root
+      //1 - user
+      //2 - delivery executive
+      type: Number,
+      enum: [0, 1, 2],
+      required: true,
+      default: 1,
+    },
   },
   { timestamps: true }
 );
