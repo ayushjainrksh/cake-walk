@@ -27,6 +27,19 @@ const OrderSchema = new Schema(
       required: true,
       default: 1,
     },
+    paymentStatus: {
+      //0 - failed
+      //1 - to be paid (pay on delivery)
+      //2 - paid
+      type: Number,
+      enum: [0, 1, 2],
+      required: true,
+      default: 1,
+    },
+    eta: {
+      //in ms
+      type: Number,
+    },
   },
   { timestamps: true }
 );
