@@ -15,6 +15,9 @@ const ItemSchema = new Schema({
   numAvailable: {
     type: Number,
   },
+  prepTime: {
+    type: Number, //in ms
+  },
 });
 
 module.exports = Item = mongoose.model("Item", ItemSchema);

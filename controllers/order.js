@@ -1,17 +1,61 @@
 const Order = require("../models/order");
+const Item = require("../models/item");
 
-const findAvailable = async (deliveryEx) => {
+const getPrepTime = async (items) => {
+  let prepTime = 0;
+  for (let itemIx = 0; itemIx < items.length; itemIx++) {
+    const item = await Item.findById(items[itemIx]);
+    prepTime += item.prepTime;
+  }
+  return prepTime; //5 mins
+};
+
+const getTimeForDistance = async (clientDistanceFromStore) => {
+  const multiplier = 1.5;
+  return clientDistanceFromStore * multiplier * 60 * 1000; //in ms
+};
+
+const findAvailable = async (deliveryEx, clientDistanceFromStore, items) => {
+  let minDeliveryTime = null;
   //TODO: Replace this with filter
   for (let exec = 0; exec < deliveryEx.length; exec++) {
+    let assignmentTime = 0;
+    let firstMileTime = 0;
+    let lastMileTime = 0;
+    let prepTime = 0;
+    let deliveryTime = 0;
+
     const orders = await Order.find({
       assignedTo: deliveryEx[exec]._id,
       status: 1,
     });
-    if (orders.length === 0) {
-      return deliveryEx[exec];
+    if (orders.length !== 0) {
+      for (let eachOrder = 0; eachOrder < orders.length; eachOrder++) {
+        assignmentTime += orders[eachOrder].eta;
+      }
+    }
+    console.log("findAvailable -> assignmentTime", assignmentTime);
+    firstMileTime = await getTimeForDistance(clientDistanceFromStore);
+    lastMileTime = firstMileTime;
+    prepTime = await getPrepTime(items);
+    deliveryTime =
+      Math.max(assignmentTime + firstMileTime, prepTime) + lastMileTime;
+    console.log("findAvailable -> deliveryTime", deliveryTime);
+    if (minDeliveryTime) {
+      console.log("not empty");
+      if (minDeliveryTime.deliveryTime > deliveryTime) {
+        minDeliveryTime.deliveryTime = deliveryTime;
+        minDeliveryTime.deliveryEx = deliveryEx[exec]._id;
+      }
+    } else {
+      console.log("empty");
+      minDeliveryTime = {};
+      minDeliveryTime["deliveryTime"] = deliveryTime;
+      minDeliveryTime["deliveryEx"] = deliveryEx[exec]._id;
     }
   }
-  return;
+  console.log("findAvailable -> minDeliveryTime", minDeliveryTime);
+  return minDeliveryTime;
 };
 
 const placeOrder = async (req, res) => {
@@ -19,14 +63,17 @@ const placeOrder = async (req, res) => {
   try {
     let deliveryEx = await User.find({ role: 2 });
     console.log(deliveryEx);
-    const availableEx = await findAvailable(deliveryEx);
-    // console.log(availableEx);
-    if (availableEx) {
-      body["assignedTo"] = availableEx._id;
-      body["locationOfDeliveryEx"] = 10; //getLoc(availableEx);
-      body["storeDistanceFromDeliveryEx"] = 15;
-      body["eta"] = 30 * 60 * 1000; //30mins
-    }
+    const minDeliveryTime = await findAvailable(
+      deliveryEx,
+      req.body.clientDistanceFromStore,
+      req.body.items
+    );
+    console.log(minDeliveryTime);
+    body["assignedTo"] = minDeliveryTime.deliveryEx;
+    body["locationOfDeliveryEx"] = 10; //getLoc(availableEx);
+    body["storeDistanceFromDeliveryEx"] = 15;
+    body["eta"] = minDeliveryTime.deliveryTime; //30mins
+
     const order = await Order.create(req.body);
     if (order) {
       console.log("Order placed");
