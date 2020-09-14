@@ -2,6 +2,7 @@ const User = require("../models/user");
 
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const user = require("../models/user");
 
 require("dotenv").config();
 
@@ -112,8 +113,18 @@ const login = async (req, res) => {
   }
 };
 
+const getAll = async (req, res) => {
+  try {
+    const users = await User.find();
+    return res.send(users);
+  } catch (err) {
+    return res.send(err);
+  }
+};
+
 module.exports = {
   ping,
   createUser,
   login,
+  getAll,
 };

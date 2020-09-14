@@ -36,6 +36,24 @@ const OrderSchema = new Schema(
       required: true,
       default: 1,
     },
+    address: {
+      type: String,
+    },
+    clientDistanceFromStore: {
+      //in km
+      type: Number,
+    },
+    locationOfDeliveryEx: {
+      type: String,
+    },
+    clientDistanceFromDeliveryEx: {
+      //in km
+      type: Number,
+    },
+    storeDistanceFromDeliveryEx: {
+      //in km
+      type: Number,
+    },
     eta: {
       //in ms
       type: Number,
