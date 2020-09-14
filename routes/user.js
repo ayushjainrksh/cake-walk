@@ -8,8 +8,22 @@ const {
   authenticateUser,
 } = require("../utils/middlewares");
 
+/**
+ * GET /ping
+ * Test API
+ */
 router.get("/ping", userController.ping);
+
+/**
+ * POST /create
+ * Create a non root user
+ */
 router.post("/create", userController.createUser);
+
+/**
+ * POST /createRootUser
+ * A root user can create a new root user
+ */
 router.post(
   "/createRootUser",
   authenticateUser,
@@ -17,7 +31,17 @@ router.post(
   accessControl,
   userController.createRootUser
 );
+
+/**
+ * POST /login
+ * Login in to your account
+ */
 router.post("/login", userController.login);
+
+/**
+ * GET /getAll
+ * Root user can access list of users
+ */
 router.get(
   "/getAll",
   authenticateUser,

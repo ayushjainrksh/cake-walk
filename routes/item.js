@@ -9,8 +9,22 @@ const {
   accessControl,
 } = require("../utils/middlewares");
 
-router.post("/create", rootAccess, accessControl, itemController.createItem); //Only root user can add new items
-router.get("/getAll", itemController.getAll); //Anyone logged in user can view items
-router.get("/:id", itemController.getItemById); //Anyone logged in user can check a particular item
+/**
+ * POST /create
+ * Root user can create an item for the shop
+ */
+router.post("/create", rootAccess, accessControl, itemController.createItem);
+
+/**
+ * GET /getAll
+ * Any logged in user can view items
+ */
+router.get("/getAll", itemController.getAll);
+
+/**
+ * GET /:id
+ * Any logged in user can check a particular item
+ */
+router.get("/:id", itemController.getItemById);
 
 module.exports = router;
