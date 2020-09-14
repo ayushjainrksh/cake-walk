@@ -1,5 +1,6 @@
 const Order = require("../models/order");
 const Item = require("../models/item");
+const bodyParser = require("body-parser");
 
 const getPrepTime = async (items) => {
   let prepTime = 0;
@@ -102,11 +103,22 @@ const getOrderById = async (req, res) => {
 
 const getAll = async (req, res) => {
   try {
-    const order = await Order.find().populate([
-      "items",
-      "placedBy",
-      "assignedTo",
-    ]);
+    let order;
+    if (req.user.access === "root") {
+      order = await Order.find().populate(["items", "placedBy", "assignedTo"]);
+    } else if (req.user.access === "user") {
+      order = await Order.find({ placedBy: req.user.id }).populate([
+        "items",
+        "placedBy",
+        "assignedTo",
+      ]);
+    } else if (req.user.access === "exec") {
+      order = await Order.find({ assignedTo: req.user.id }).populate([
+        "items",
+        "placedBy",
+        "assignedTo",
+      ]);
+    }
     return res.send({ orders: order });
   } catch (err) {
     console.log("getAll -> err", err);
@@ -117,12 +129,23 @@ const getAll = async (req, res) => {
 const updateStatus = async (req, res) => {
   let body = req.body;
   try {
-    let order = await Order.findByIdAndUpdate(
-      req.params.id,
-      { status: body.status, paymentStatus: body.paymentStatus, eta: 0 },
-      { new: true }
-    );
-    if (order) return res.send({ order: order });
+    if (req.user.access === "root") {
+      let order = await Order.findByIdAndUpdate(
+        req.params.id,
+        { status: body.status, paymentStatus: body.paymentStatus, eta: 0 },
+        { new: true }
+      );
+      if (order) return res.send({ order: order });
+    } else if (req.user.access === "exec") {
+      let order = await Order.findById(req.params.id);
+      if (order && String(order.assignedTo) === req.user.id) {
+        order.status = body.status;
+        order.paymentStatus = body.paymentStatus;
+        order.eta = body.eta;
+        order.save();
+      }
+      return res.send({ order: order });
+    }
   } catch (err) {
     console.log("updateStatus -> err", err);
     return res.send({ err: err });
