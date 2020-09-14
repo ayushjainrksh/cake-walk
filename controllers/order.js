@@ -67,8 +67,24 @@ const getAll = async (req, res) => {
   }
 };
 
+const updateStatus = async (req, res) => {
+  let body = req.body;
+  try {
+    let order = await Order.findByIdAndUpdate(
+      req.params.id,
+      { status: body.status, paymentStatus: body.paymentStatus, eta: 0 },
+      { new: true }
+    );
+    if (order) return res.send({ order: order });
+  } catch (err) {
+    console.log("updateStatus -> err", err);
+    return res.send({ err: err });
+  }
+};
+
 module.exports = {
   placeOrder,
   getOrderById,
   getAll,
+  updateStatus,
 };

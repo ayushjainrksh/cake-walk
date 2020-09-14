@@ -28,7 +28,7 @@ const OrderSchema = new Schema(
       default: 1,
     },
     paymentStatus: {
-      //0 - failed
+      //0 - failed or cancelled
       //1 - to be paid (pay on delivery)
       //2 - paid
       type: Number,
