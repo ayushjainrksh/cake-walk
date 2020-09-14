@@ -23,7 +23,7 @@ const authenticateUser = (request, response, next) => {
 
     jwt.verify(token, process.env.JWT_ENCRYPTION, (err, user) => {
       if (err) {
-        return res.sendStatus(403);
+        return response.sendStatus(403);
       }
       request.user = user;
       next();

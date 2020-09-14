@@ -5,13 +5,18 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
+require("dotenv").config();
+
 try {
-  mongoose.connect("mongodb://localhost:27017/cake-walk-db", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false,
-    useCreateIndex: true,
-  });
+  mongoose.connect(
+    process.env.MONGO_URI || "mongodb://localhost:27017/cake-walk-db",
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useFindAndModify: false,
+      useCreateIndex: true,
+    }
+  );
   console.log("Connected to MongoDB server...");
 } catch (error) {
   console.log("Error in connection to mongodb : ", error.message);
