@@ -1,9 +1,4 @@
-const {
-  authenticateUser,
-  accessControl,
-  rootAccess,
-  userAccess,
-} = require("../utils/middlewares");
+const { authenticateUser } = require("../utils/middlewares");
 
 module.exports = (app) => {
   app.use("/api/v1/user", require("./user"));
