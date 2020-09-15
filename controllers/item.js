@@ -4,32 +4,35 @@ const createItem = async (req, res) => {
   try {
     const item = await Item.create(req.body);
     if (item) {
-      console.log("Item created successfully");
-      return res.send({ item: item });
+      return res.send({ result: item, message: "Item created successfully" });
     }
+    return res.send({
+      result: null,
+      message: "Something went wrong. Please try again.",
+    });
   } catch (err) {
-    console.log("createItem -> err", err);
-    return res.send({ err: err });
+    return res.send({ err: err, message: "Error while adding item" });
   }
 };
 
 const getAll = async (req, res) => {
   try {
     const item = await Item.find();
-    return res.send({ items: item });
+    if (item)
+      return res.send({ result: item, message: `${item.length} items found` });
+    return res.send({ result: null, message: `No items found` });
   } catch (err) {
-    console.log("getAll -> err", err);
-    return res.send({ err: err });
+    return res.send({ err: err, message: "Error while finding items" });
   }
 };
 
 const getItemById = async (req, res) => {
   try {
     const item = await Item.findById(req.params.id);
-    return res.send({ item: item });
+    if (item) return res.send({ result: item, message: "Found item" });
+    return res.send({ result: null, message: "No such item" });
   } catch (err) {
-    console.log("getAll -> err", err);
-    return res.send({ err: err });
+    return res.send({ err: err, message: "Error while finding item" });
   }
 };
 
