@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 
 require("dotenv").config();
 
+//Logs each request to console
 const requestLogger = (request, response, next) => {
   console.log("Method:", request.method);
   console.log("Path:  ", request.path);
@@ -11,28 +12,32 @@ const requestLogger = (request, response, next) => {
   next();
 };
 
+//Default endpoint
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: "unknown endpoint" });
 };
 
+//Check for user log in
 const authenticateUser = (request, response, next) => {
   const authHeader = request.headers.authorization;
 
   if (authHeader) {
+    //Get Bearer token
     const token = authHeader.split(" ")[1];
 
     jwt.verify(token, process.env.JWT_ENCRYPTION, (err, user) => {
       if (err) {
-        return response.sendStatus(403);
+        return response.sendStatus(403); //Forbidden
       }
       request.user = user;
       next();
     });
   } else {
-    response.sendStatus(401);
+    response.sendStatus(401); //Unauthorized
   }
 };
 
+//Implement different levels of access control
 const accessControl = async (request, response, next) => {
   const user = await User.findById(request.user.id);
   if (user.role === 0) {
@@ -49,8 +54,9 @@ const accessControl = async (request, response, next) => {
     request.user.access = "denied";
   }
 
+  //Check if a particular level of access is granted
   if (response.locals.access.includes(request.user.access)) next();
-  else response.sendStatus(401);
+  else response.sendStatus(401); //Unauthorized
 };
 
 const rootAccess = (request, response, next) => {
