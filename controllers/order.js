@@ -83,6 +83,7 @@ const findAvailable = async (deliveryEx, clientDistanceFromStore, items) => {
 const placeOrder = async (req, res) => {
   let body = req.body;
   try {
+    body["placedBy"] = await req.user.id;
     //Find list of delivery executives
     let deliveryEx = await User.find({ role: 2 });
 
