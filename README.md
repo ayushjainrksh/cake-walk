@@ -16,6 +16,9 @@ Cake Walk is a collection of APIs to simplify food ordering and delivery mechani
 - A dashboard where Mary can view all the orders with only Mary being authorized to use this dashboard
 - Mary can create other root users. Root users can view the dashboard.
 
+## Design
+![cake walk design](https://github.com/ayushjainrksh/cake-walk/blob/master/static/cake-walk-design.png)
+
 ## Tech stack
 - Backend - Node.js
 - Database - Mongodb
@@ -68,3 +71,6 @@ password: hello123
 - Use this token as Authorization token in postman to make other requests such as `GET /api/v1/order/getAll`
 
 > I have created most of the requests in postman. Let me know if you want me to invite you to collaborate in Postman.
+
+
+Created with :heart: by Ayush Jain
